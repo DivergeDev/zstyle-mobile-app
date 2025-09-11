@@ -12,6 +12,8 @@ This is the boilerplate that [Infinite Red](https://infinite.red) uses as a way 
 ```bash
 npm install
 npm run start
+
+npm run ios
 ```
 
 To make things work on your local simulator, or on your phone, you need first to [run `eas build`](https://github.com/infinitered/ignite/blob/master/docs/expo/EAS.md). We have many shortcuts on `package.json` to make it easier:
