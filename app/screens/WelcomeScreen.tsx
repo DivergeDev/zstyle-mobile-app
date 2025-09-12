@@ -1,32 +1,37 @@
-import { FC } from "react"
-import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
-
-import { Button } from "@/components/Button"
-import { Screen } from "@/components/Screen"
+import { useState, useEffect, useCallback } from "react"
+import { View, StyleSheet, Dimensions } from "react-native"
 import { Text } from "@/components/Text"
-import { useAuth } from "@/context/AuthContext"
-import { isRTL } from "@/i18n"
+
+import { VideoAvatar } from "@/components/Avatar/VideoAvatar"
+import { QuestionForm } from "@/components/Forms/QuestionForm"
+import { Screen } from "@/components/Screen"
 import type { AppStackScreenProps } from "@/navigators/AppNavigator"
+import { questionService } from "@/services/questionService"
+import { speechService } from "@/services/speechService" // Temporarily disabled
 import { useAppTheme } from "@/theme/context"
 import { $styles } from "@/theme/styles"
-import type { ThemedStyle } from "@/theme/types"
+import { QuestionFlow, QuestionResponse } from "@/types/questionTypes"
 import { useHeader } from "@/utils/useHeader"
 import { useSafeAreaInsetsStyle } from "@/utils/useSafeAreaInsetsStyle"
 
-const welcomeLogo = require("@assets/images/logo.png")
-const welcomeFace = require("@assets/images/welcome-face.png")
+const { width: _screenWidth, height: _screenHeight } = Dimensions.get("window")
 
 interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> {}
 
-export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen(_props) {
-  const { themed, theme } = useAppTheme()
-
+export const WelcomeScreen: React.FC<WelcomeScreenProps> = function WelcomeScreen(_props) {
+  const { themed: _themed } = useAppTheme()
   const { navigation } = _props
-  const { logout } = useAuth()
 
-  function goNext() {
-    navigation.navigate("Demo", { screen: "DemoShowroom", params: {} })
-  }
+  const [questionFlow, setQuestionFlow] = useState<QuestionFlow>(() =>
+    questionService.createQuestionFlow(),
+  )
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const [isListening, _setIsListening] = useState(false)
+  const [currentQuestion, setCurrentQuestion] = useState(() =>
+    questionService.getCurrentQuestion(questionFlow),
+  )
+
+  const { logout } = { logout: () => {} } // TODO: Get from auth context
 
   useHeader(
     {
@@ -36,75 +41,200 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen(_pro
     [logout],
   )
 
-  const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
+  const _bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
+
+  // Speak the current question when it changes
+  useEffect(() => {
+    if (currentQuestion) {
+      speakQuestion(currentQuestion.question)
+    }
+  }, [currentQuestion])
+
+  const speakQuestion = useCallback(async (text: string) => {
+    try {
+      setIsSpeaking(true)
+      // Temporarily disable speech to get app running
+      // await speechService.speak({
+      //   text,
+      //   onStart: () => setIsSpeaking(true),
+      //   onDone: () => setIsSpeaking(false),
+      //   onError: (error) => {
+      //     console.error("Speech error:", error)
+      //     setIsSpeaking(false)
+      //   },
+      // })
+      // Simulate speech delay
+      setTimeout(() => {
+        setIsSpeaking(false)
+      }, 2000)
+    } catch (error) {
+      console.error("Failed to speak question:", error)
+      setIsSpeaking(false)
+    }
+  }, [])
+
+  const handleResponseSubmit = useCallback(
+    (response: QuestionResponse) => {
+      const updatedFlow = questionService.submitResponse(questionFlow, response)
+      setQuestionFlow(updatedFlow)
+    },
+    [questionFlow],
+  )
+
+  const handleNextQuestion = useCallback(() => {
+    const updatedFlow = questionService.goToNextQuestion(questionFlow)
+    setQuestionFlow(updatedFlow)
+
+    if (updatedFlow.isComplete) {
+      // All questions completed - navigate to next screen
+      handleComplete()
+    } else {
+      // Move to next question
+      const nextQuestion = questionService.getCurrentQuestion(updatedFlow)
+      setCurrentQuestion(nextQuestion)
+    }
+  }, [questionFlow])
+
+  const handlePreviousQuestion = useCallback(() => {
+    const updatedFlow = questionService.goToPreviousQuestion(questionFlow)
+    setQuestionFlow(updatedFlow)
+    const prevQuestion = questionService.getCurrentQuestion(updatedFlow)
+    setCurrentQuestion(prevQuestion)
+  }, [questionFlow])
+
+  const handleComplete = useCallback(() => {
+    // Save responses to storage or send to backend
+    console.log("Survey completed with responses:", questionFlow.responses)
+
+    // Navigate to the next screen
+    navigation.navigate("Demo", { screen: "DemoShowroom", params: {} })
+  }, [questionFlow.responses, navigation])
+
+  const getProgressPercentage = () => {
+    return questionService.getProgressPercentage(questionFlow)
+  }
+
+  const canGoBack = questionFlow.currentQuestionIndex > 0
+  const isLastQuestion = questionFlow.currentQuestionIndex === questionFlow.questions.length - 1
+
+  if (!currentQuestion) {
+    return (
+      <Screen preset="fixed" contentContainerStyle={$styles.flex1}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </Screen>
+    )
+  }
 
   return (
     <Screen preset="fixed" contentContainerStyle={$styles.flex1}>
-      <View style={themed($topContainer)}>
-        <Image style={themed($welcomeLogo)} source={welcomeLogo} resizeMode="contain" />
-        <Text
-          testID="welcome-heading"
-          style={themed($welcomeHeading)}
-          tx="welcomeScreen:readyForLaunch"
-          preset="heading"
-        />
-        <Text tx="welcomeScreen:exciting" preset="subheading" />
-        <Image
-          style={$welcomeFace}
-          source={welcomeFace}
-          resizeMode="contain"
-          tintColor={theme.colors.palette.neutral900}
-        />
-      </View>
+      <View style={styles.container}>
+        {/* Header with progress */}
+        <View style={styles.header}>
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: `${getProgressPercentage()}%` }]} />
+            </View>
+            <Text style={styles.progressText}>
+              {questionFlow.currentQuestionIndex + 1} of {questionFlow.questions.length}
+            </Text>
+          </View>
+        </View>
 
-      <View style={themed([$bottomContainer, $bottomContainerInsets])}>
-        <Text tx="welcomeScreen:postscript" size="md" />
+        {/* Avatar Section */}
+        <View style={styles.avatarSection}>
+          <VideoAvatar
+            isIdle={!isSpeaking && !isListening}
+            isSpeaking={isSpeaking}
+            isListening={isListening}
+          />
+          <View style={styles.questionContainer}>
+            <Text style={styles.questionText}>{currentQuestion.question}</Text>
+          </View>
+        </View>
 
-        <Button
-          testID="next-screen-button"
-          preset="reversed"
-          tx="welcomeScreen:letsGo"
-          onPress={goNext}
-        />
+        {/* Form Section */}
+        <View style={styles.formSection}>
+          <QuestionForm
+            question={currentQuestion}
+            onSubmit={handleResponseSubmit}
+            onNext={handleNextQuestion}
+            onPrevious={canGoBack ? handlePreviousQuestion : undefined}
+            canGoBack={canGoBack}
+            isLastQuestion={isLastQuestion}
+            initialValue={
+              questionService.getResponseByQuestionId(questionFlow, currentQuestion.id)?.answer
+            }
+          />
+        </View>
       </View>
     </Screen>
   )
 }
 
-const $topContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  flexShrink: 1,
-  flexGrow: 1,
-  flexBasis: "57%",
-  justifyContent: "center",
-  paddingHorizontal: spacing.lg,
-})
-
-const $bottomContainer: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  flexShrink: 1,
-  flexGrow: 0,
-  flexBasis: "43%",
-  backgroundColor: colors.palette.neutral100,
-  borderTopLeftRadius: 16,
-  borderTopRightRadius: 16,
-  paddingHorizontal: spacing.lg,
-  justifyContent: "space-around",
-})
-
-const $welcomeLogo: ThemedStyle<ImageStyle> = ({ spacing }) => ({
-  height: 88,
-  width: "100%",
-  marginBottom: spacing.xxl,
-})
-
-const $welcomeFace: ImageStyle = {
-  height: 169,
-  width: 269,
-  position: "absolute",
-  bottom: -47,
-  right: -80,
-  transform: [{ scaleX: isRTL ? -1 : 1 }],
-}
-
-const $welcomeHeading: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  marginBottom: spacing.md,
+const styles = StyleSheet.create({
+  avatarSection: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  container: {
+    backgroundColor: "#FFFFFF",
+    flex: 1,
+  },
+  formSection: {
+    backgroundColor: "#F9FAFB",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    flex: 1,
+    paddingTop: 20,
+  },
+  header: {
+    paddingBottom: 10,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  loadingContainer: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
+  },
+  loadingText: {
+    color: "#6B7280",
+    fontSize: 18,
+  },
+  progressBar: {
+    backgroundColor: "#E5E7EB",
+    borderRadius: 2,
+    height: 4,
+    marginBottom: 8,
+    width: "100%",
+  },
+  progressContainer: {
+    alignItems: "center",
+  },
+  progressFill: {
+    backgroundColor: "#4F46E5",
+    borderRadius: 2,
+    height: "100%",
+  },
+  progressText: {
+    color: "#6B7280",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  questionContainer: {
+    marginTop: 30,
+    paddingHorizontal: 20,
+  },
+  questionText: {
+    color: "#111827",
+    fontSize: 20,
+    fontWeight: "600",
+    lineHeight: 28,
+    textAlign: "center",
+  },
 })

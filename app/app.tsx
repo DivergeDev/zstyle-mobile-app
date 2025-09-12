@@ -17,6 +17,7 @@ if (__DEV__) {
   require("./devtools/ReactotronConfig.ts")
 }
 import "./utils/gestureHandler"
+import "../global.css"
 
 import { useEffect, useState } from "react"
 import { useFonts } from "expo-font"
