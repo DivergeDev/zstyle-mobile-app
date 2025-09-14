@@ -1,79 +1,173 @@
-# Welcome to your new ignited app!
+# ZStyle Mobile App
 
-> The latest and greatest boilerplate for Infinite Red opinions
-
-This is the boilerplate that [Infinite Red](https://infinite.red) uses as a way to test bleeding-edge changes to our React Native stack.
-
-- [Quick start documentation](https://github.com/infinitered/ignite/blob/master/docs/boilerplate/Boilerplate.md)
-- [Full documentation](https://github.com/infinitered/ignite/blob/master/docs/README.md)
+A React Native mobile application built with Expo, featuring modern UI components, internationalization, and robust development tooling.
 
 ## Getting Started
 
+### Prerequisites
+
+- Node.js >= 20.0.0
+- npm or yarn
+- Expo CLI: `npm install -g @expo/cli`
+- EAS CLI: `npm install -g eas-cli`
+
+### Installation
+
 ```bash
 npm install
-npm run start
-
-npm run ios
 ```
 
-To make things work on your local simulator, or on your phone, you need first to [run `eas build`](https://github.com/infinitered/ignite/blob/master/docs/expo/EAS.md). We have many shortcuts on `package.json` to make it easier:
+### Development Setup
+
+#### For Windows/Android Development
+
+1. **Install Android Studio** and set up Android SDK
+2. **Configure environment variables** for Android development
+3. **Start the development server**:
+   ```bash
+   npm run start
+   ```
+
+#### Using Expo Go (Recommended for Quick Testing)
+
+1. Install Expo Go on your Android device
+2. Run the development server: `npm run start`
+3. Scan the QR code with Expo Go
+
+#### Using Development Builds
+
+For a better development experience with native modules:
+
+1. **Login to Expo**:
+   ```bash
+   eas login
+   ```
+
+2. **Build development version for Android**:
+   ```bash
+   npm run build:android:sim  # For emulator
+   npm run build:android:dev  # For physical device
+   ```
+
+3. **Install the build** on your device/emulator
+4. **Start development server**: `npm run start`
+
+### Platform-Specific Commands
 
 ```bash
-npm run build:ios:sim # build for ios simulator
-npm run build:ios:dev # build for ios device
-npm run build:ios:prod # build for ios device
+# Android
+npm run android              # Run on connected Android device/emulator
+npm run build:android:sim    # Build for Android emulator
+npm run build:android:dev    # Build for Android device
+npm run build:android:preview # Build preview APK
+npm run build:android:prod   # Build production APK
+
+# iOS (requires macOS)
+npm run ios                  # Run on connected iOS device/simulator
+npm run build:ios:sim        # Build for iOS simulator
+npm run build:ios:dev        # Build for iOS device
+npm run build:ios:preview    # Build preview IPA
+npm run build:ios:prod       # Build production IPA
+
+# Web
+npm run web                  # Start web development server
+npm run bundle:web           # Build for web deployment
+npm run serve:web            # Serve built web app
 ```
 
-### `./assets` directory
+## Deployment
 
-This directory is designed to organize and store various assets, making it easy for you to manage and use them in your application. The assets are further categorized into subdirectories, including `icons` and `images`:
+### TestFlight (iOS) - Requires macOS
 
-```tree
-assets
-├── icons
-└── images
+1. **Ensure you have a Mac** with Xcode installed
+2. **Configure app store credentials**:
+   ```bash
+   eas credentials
+   ```
+
+3. **Build for TestFlight**:
+   ```bash
+   npm run build:ios:prod
+   ```
+
+4. **Submit to TestFlight**:
+   ```bash
+   eas submit --platform ios
+   ```
+
+### Google Play (Android)
+
+1. **Build production APK/AAB**:
+   ```bash
+   npm run build:android:prod
+   ```
+
+2. **Submit to Google Play Console**:
+   - Upload the generated APK/AAB file
+   - Configure store listing, screenshots, and release notes
+   - Publish to internal testing, beta, or production
+
+## Project Structure
+
+```
+app/
+├── components/          # Reusable UI components
+├── screens/            # App screens
+├── navigators/         # Navigation configuration
+├── services/           # API and external services
+├── context/            # React contexts
+├── theme/              # Styling and theming
+├── i18n/               # Internationalization
+├── utils/              # Utility functions
+└── config/             # App configuration
+
+assets/
+├── icons/              # Icon assets
+└── images/             # Image assets
 ```
 
-**icons**
-This is where your icon assets will live. These icons can be used for buttons, navigation elements, or any other UI components. The recommended format for icons is PNG, but other formats can be used as well.
+## Available Scripts
 
-Ignite comes with a built-in `Icon` component. You can find detailed usage instructions in the [docs](https://github.com/infinitered/ignite/blob/master/docs/boilerplate/app/components/Icon.md).
-
-**images**
-This is where your images will live, such as background images, logos, or any other graphics. You can use various formats such as PNG, JPEG, or GIF for your images.
-
-Another valuable built-in component within Ignite is the `AutoImage` component. You can find detailed usage instructions in the [docs](https://github.com/infinitered/ignite/blob/master/docs/Components-AutoImage.md).
-
-How to use your `icon` or `image` assets:
-
-```typescript
-import { Image } from 'react-native';
-
-const MyComponent = () => {
-  return (
-    <Image source={require('assets/images/my_image.png')} />
-  );
-};
+```bash
+npm run start              # Start Expo development server
+npm run android            # Run on Android
+npm run ios                # Run on iOS
+npm run web                # Run on web
+npm run test               # Run tests
+npm run test:watch         # Run tests in watch mode
+npm run lint               # Run ESLint
+npm run compile            # Type check with TypeScript
+npm run align-deps         # Fix dependency versions
 ```
 
-## Running Maestro end-to-end tests
+## Technologies Used
 
-Follow our [Maestro Setup](https://ignitecookbook.com/docs/recipes/MaestroSetup) recipe.
+- **React Native** with Expo
+- **TypeScript** for type safety
+- **NativeWind** for styling (Tailwind CSS for React Native)
+- **React Navigation** for navigation
+- **React Hook Form** for form management
+- **i18next** for internationalization
+- **MMKV** for local storage
+- **Expo AV** for audio/video
+- **Expo Speech** for text-to-speech
 
-## Next Steps
+## Testing
 
-### Ignite Cookbook
+```bash
+npm run test               # Run Jest tests
+npm run test:maestro       # Run Maestro E2E tests
+```
 
-[Ignite Cookbook](https://ignitecookbook.com/) is an easy way for developers to browse and share code snippets (or “recipes”) that actually work.
+## Contributing
 
-### Upgrade Ignite boilerplate
-
-Read our [Upgrade Guide](https://ignitecookbook.com/docs/recipes/UpdatingIgnite) to learn how to upgrade your Ignite project.
+1. Follow the existing code style
+2. Run `npm run lint` before committing
+3. Add tests for new features
+4. Update documentation as needed
 
 ## Community
 
-⭐️ Help us out by [starring on GitHub](https://github.com/infinitered/ignite), filing bug reports in [issues](https://github.com/infinitered/ignite/issues) or [ask questions](https://github.com/infinitered/ignite/discussions).
-
-💬 Join us on [Slack](https://join.slack.com/t/infiniteredcommunity/shared_invite/zt-1f137np4h-zPTq_CbaRFUOR_glUFs2UA) to discuss.
-
-📰 Make our Editor-in-chief happy by [reading the React Native Newsletter](https://reactnativenewsletter.com/).
+- [Infinite Red Ignite](https://github.com/infinitered/ignite) - The boilerplate this app is based on
+- [Expo Documentation](https://docs.expo.dev/)
+- [React Native Documentation](https://reactnative.dev/docs)
