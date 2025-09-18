@@ -42,9 +42,12 @@ export default function RootLayout() {
   return <RootLayoutNav />;
 }
 
+import { useThemeStore } from '@/stores/useThemeStore';
+
 function RootLayoutNav() {
   const pathname = usePathname();
-  const [colorMode, setColorMode] = useState<'light' | 'dark'>('light');
+  const colorMode = useThemeStore((s) => s.mode);
+  const toggleTheme = useThemeStore((s) => s.toggle);
 
   return (
     <GluestackUIProvider mode={colorMode}>
@@ -52,13 +55,11 @@ function RootLayoutNav() {
         <Slot />
         {pathname === '/' && (
           <Fab
-            onPress={() =>
-              setColorMode(colorMode === 'dark' ? 'light' : 'dark')
-            }
+            onPress={toggleTheme}
             className="m-6"
             size="lg"
           >
-            <FabIcon as={colorMode === 'dark' ? MoonIcon : SunIcon} />
+            <FabIcon as={colorMode === 'dark' ? SunIcon : MoonIcon} />
           </Fab>
         )}
       </ThemeProvider>
