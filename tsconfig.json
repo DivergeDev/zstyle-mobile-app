@@ -25,10 +25,14 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./app/*"
+        "./app/*",
+        "./*"
       ],
       "@assets/*": [
         "./assets/*"
+      ],
+      "tailwind.config": [
+        "./tailwind.config.js"
       ]
     },
     "typeRoots": [

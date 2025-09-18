@@ -5,6 +5,9 @@ import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 
 export const Screen1: React.FC = function Screen1() {
+
+  // implement object state for the main user information
+
   return (
     <Screen preset="scroll" contentContainerStyle={styles.container}>
       <View style={styles.content}>
@@ -12,7 +15,8 @@ export const Screen1: React.FC = function Screen1() {
         <Text style={styles.subtitle}>
           This is a placeholder for Screen 1. Add your content here.
         </Text>
-        <Text>Life DashBoard - switch between day and total view</Text>
+        <Text>Life DashBoard - switch between day tracker and total view</Text>
+
       </View>
     </Screen>
   )
