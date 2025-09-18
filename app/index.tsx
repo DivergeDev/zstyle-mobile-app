@@ -8,6 +8,9 @@ import { Text } from '@/components/ui/text';
 import { Button, ButtonText } from '@/components/ui/button';
 import { useRouter } from 'expo-router';
 import { Icon } from '@/components/ui/icon';
+import { Fab, FabIcon } from '@/components/ui/fab';
+import { MoonIcon, SunIcon } from '@/components/ui/icon';
+import { useThemeStore } from '@/stores/useThemeStore';
 
 const FeatureCard = ({ iconSvg: IconSvg, name, desc }: any) => {
   return (
@@ -26,6 +29,8 @@ const FeatureCard = ({ iconSvg: IconSvg, name, desc }: any) => {
 
 export default function Home() {
   const router = useRouter();
+  const colorMode = useThemeStore((s) => s.mode);
+  const toggleTheme = useThemeStore((s) => s.toggle);
   return (
     <Box className="flex-1 bg-background-300 h-[100vh]">
         <Box className="absolute h-[500px] w-[500px] lg:w-[700px] lg:h-[700px]">
@@ -58,6 +63,9 @@ export default function Home() {
           </Box>
         </Box>
       {/* </ScrollView> */}
+      <Fab onPress={toggleTheme} className="m-6" size="lg">
+        <FabIcon as={colorMode === 'dark' ? SunIcon : MoonIcon} />
+      </Fab>
     </Box>
   );
 }
