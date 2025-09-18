@@ -12,6 +12,8 @@ import { useEffect, useState } from 'react';
 import { useColorScheme } from '@/components/useColorScheme';
 import { Slot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaView } from '@/components/ui/safe-area-view';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -46,10 +48,14 @@ function RootLayoutNav() {
   const colorMode = useThemeStore((s) => s.mode);
 
   return (
-    <GluestackUIProvider mode={colorMode}>
-      <ThemeProvider value={colorMode === 'dark' ? DarkTheme : DefaultTheme}>
-        <Slot />
-      </ThemeProvider>
-    </GluestackUIProvider>
+    <SafeAreaProvider>
+      <GluestackUIProvider mode={colorMode}>
+        <ThemeProvider value={colorMode === 'dark' ? DarkTheme : DefaultTheme}>
+          <SafeAreaView style={{ flex: 1 }} edges={['top', 'right', 'bottom', 'left']}>
+            <Slot />
+          </SafeAreaView>
+        </ThemeProvider>
+      </GluestackUIProvider>
+    </SafeAreaProvider>
   );
 }
