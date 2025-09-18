@@ -1,5 +1,5 @@
 module.exports = function (api) {
-  api.cache(true)
+  api.cache(true);
 
   return {
     presets: [
@@ -17,12 +17,14 @@ module.exports = function (api) {
         'module-resolver',
         {
           root: ['./'],
+
           alias: {
             '@': './',
             'tailwind.config': './tailwind.config.js',
           },
         },
       ],
+      'react-native-reanimated/plugin',
     ],
-  }
-}
+  };
+};
