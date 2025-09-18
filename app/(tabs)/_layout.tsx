@@ -14,22 +14,34 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
+        headerShown: false,
       }}
     >
       <Tabs.Screen
-        name="tab1"
+        name="index"
         options={{
-          title: 'Tab 1',
+          title: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="star-o" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="tab2"
+        name="explore"
         options={{
-          title: 'Tab 2',
+          title: 'Explore',
+          tabBarIcon: ({ color }) => <TabBarIcon name="star-o" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="chat"
+        options={{
+          title: 'Chat',
+          tabBarIcon: ({ color }) => <TabBarIcon name="star-o" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
           tabBarIcon: ({ color }) => <TabBarIcon name="star-o" color={color} />,
         }}
       />
