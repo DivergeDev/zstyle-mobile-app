@@ -1,34 +1,46 @@
 import React from "react"
-import { View, StyleSheet } from "react-native"
-
-import { SafeAreaView } from "@/components/ui/safe-area-view"
-import { Text } from "@/components/ui/text"
 import { Center } from "@/components/ui/center"
+import { VStack } from "@/components/ui/vstack"
+import { HStack } from "@/components/ui/hstack"
+import { Heading } from "@/components/ui/heading"
+import { Divider } from "@/components/ui/divider"
+import { Text } from "@/components/ui/text"
+import { Card } from "@/components/ui/card"
+import { Box } from "@/components/ui/box"
+import { Input, InputField } from "@/components/ui/input"
+import { Button, ButtonText } from "@/components/ui/button"
 
 export default function ChatScreen() {
-  return (
-    <Center className="flex-1">
-      <View>
-        <Text>Chat</Text>
-        <Text>
-          This is a placeholder for Screen 3. Add your content here.
-        </Text>
-        <Text>
-          Jimmy you are to do this without AI.
-          AI is only allowed to be in plan mode to help with choosing the correct components.
-          All code will be written by you. 
-          This is your dream now honor it.
-        </Text>
-        <Text>Chat Page</Text>
-        <Text>Must have: </Text>
-        <Text>1. place at top for agent and name at the top with a context button</Text>
-        <Text>2. input and keyboard with send button</Text>
-        <Text>3. Voice button to talk and see transcript</Text>
-        <Text>4. Chat like text never deletes scroll till certain point for re query</Text>
-        <Text>5. When voice calls happen, cron jobs, edits things the agent does, the logs go here</Text>
-        <Text> ex. PhoneCall - Morning Wake Up - Snoozed 2x & Went Straight To TikTok</Text>
+  const [message, setMessage] = React.useState("")
 
-      </View>
+  return (
+    <Center className="flex-1 px-6">
+      <VStack space="lg" className="w-full max-w-[900px]">
+        <Heading className="text-2xl">Chat</Heading>
+        <Divider />
+
+        <Card>
+          <VStack space="md">
+            <Box className="h-[340px] rounded-md border border-outline-200 bg-background-50 p-4">
+              <Text className="text-typography-500">No messages yet.</Text>
+            </Box>
+
+            <HStack space="md" className="items-center">
+              <Input className="flex-1">
+                <InputField
+                  value={message}
+                  onChangeText={setMessage}
+                  placeholder="Type a message..."
+                  returnKeyType="send"
+                />
+              </Input>
+              <Button onPress={() => setMessage("")}> 
+                <ButtonText>Send</ButtonText>
+              </Button>
+            </HStack>
+          </VStack>
+        </Card>
+      </VStack>
     </Center>
   )
 }
