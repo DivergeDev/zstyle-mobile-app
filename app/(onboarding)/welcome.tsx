@@ -9,11 +9,16 @@ import { Center } from "@/components/ui/center"
 import { VStack } from "@/components/ui/vstack"
 import { Heading } from "@/components/ui/heading"
 import { Card } from "@/components/ui/card"
-
+import { useAuthStore } from "@/stores/useAuthStore"
 
 export default function Welcome() {
-  // Soon to change to zustand user state to be able to get all starter configurations from user
   const [agreed, setAgreed] = React.useState(false)
+  const setOnboardingDone = useAuthStore((s) => s.setOnboardingDone)
+
+  const handleContinue = () => {
+    setOnboardingDone(true)
+    router.replace('/(tabs)')
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -46,7 +51,7 @@ export default function Welcome() {
             </Checkbox>
 
             <ButtonGroup isDisabled={!agreed}>
-              <Button onPress={() => router.replace('/(tabs)')}>
+              <Button onPress={handleContinue}>
                 <ButtonText>Get Started</ButtonText>
               </Button>
             </ButtonGroup>
@@ -56,3 +61,4 @@ export default function Welcome() {
     </SafeAreaView>
   )
 }
+
