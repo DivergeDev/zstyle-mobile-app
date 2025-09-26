@@ -13,14 +13,16 @@ export default function HomeTab() {
         <Heading className="text-2xl">Home</Heading>
         <Divider />
         <Card>
+          <Text>Dashboard for life. see important emails, integrated app data, goals, todos, etc if your school or job uses it we can integrate it</Text>
           <VStack space="md">
             <Text className="text-typography-600">
               Example gluestack-ui components in action:
             </Text>
-            <EditScreenInfo path="app/(tabs)/index.tsx" />
+            <EditScreenInfo path="app/(tabs)/(home)/index.tsx" />
           </VStack>
         </Card>
       </VStack>
     </Center>
   );
 }
+

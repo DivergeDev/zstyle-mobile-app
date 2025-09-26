@@ -1,13 +1,14 @@
 # Zstyle Mobile App (Expo + Router + NativeWind)
 
-Expo app using Expo Router, Gluestack UI primitives, Tailwind via NativeWind, and Zustand stores. TypeScript in strict mode with 2-space indentation.
+Expo app using Expo Router, Gluestack UI primitives, Tailwind via NativeWind, Zustand stores, and Supabase (auth + db). TypeScript in strict mode with 2-space indentation.
 
 ## Overview
-- Tech: Expo, Expo Router, NativeWind (Tailwind), Gluestack UI, Zustand, Jest (jest-expo).
+- Tech: Expo, Expo Router, NativeWind (Tailwind), Gluestack UI, Zustand, Supabase (auth + database), Jest (jest-expo).
 - Structure:
   - `app/` Expo Router routes, layouts, tabs, modals, not-found
   - `components/` shared UI and hooks; `components/ui/` Gluestack primitives
-  - `stores/` Zustand stores (e.g., `useAuthStore.ts`, `useUserStore.ts`)
+  - `stores/` Zustand stores (e.g., `useAuthStore.ts`, `useUserStore.ts`). See `stores/README.md`.
+  - `lib/` app integrations and services: `supabase.ts`, `database.ts` types, `users.ts` profile service. See `lib/README.md`.
   - `assets/` images, icons, fonts
   - Config: `tsconfig.json`, `tailwind.config.js`, `babel.config.js`, `metro.config.js`, `app.json`, `global.css`
 
@@ -20,6 +21,14 @@ Expo app using Expo Router, Gluestack UI primitives, Tailwind via NativeWind, an
 
 ## Setup
 - Install dependencies: `npm install`
+ - Create a Supabase project and set environment variables (Expo public env):
+   - `EXPO_PUBLIC_SUPABASE_URL`
+   - `EXPO_PUBLIC_SUPABASE_KEY` (Anon key)
+ - Create the profiles table (example schema) and enable RLS:
+   - Table: `public.profiles(id uuid primary key references auth.users(id), created_at timestamptz default now(), premium_user boolean default false, goals json default '{"goals": []}', hired_agents json default '{"hired_agents": []}', integrations json default '{"integrations": []}')`
+   - Enable RLS: `alter table public.profiles enable row level security;`
+   - Policy (select own row): `create policy "Allow select own profile" on public.profiles for select using (auth.uid() = id);`
+ - Optionally add insert/update policies for future writes.
 
 ## Run
 - Start dev server: `npm start`
@@ -58,6 +67,27 @@ Tips
 
 Build (Web)
 - Export static site to `dist/`: `npm run build`
+
+## Data Flow (Supabase + Zustand)
+- Auth
+  - `providers/AuthProvider.tsx` initializes Supabase auth session and listens to auth state.
+  - Auth `user` and `session` live in `stores/useAuthStore.ts`.
+- Profile (public.profiles)
+  - On login, `AuthProvider` triggers `useUserStore.fetchMe(user.id)` to load the profile row.
+  - `useUserStore.ts` caches the row (`ProfileRow`) and tracks `status`/`error`.
+  - `app/(tabs)/(profile)/index.tsx` renders the raw JSON via `JSON.stringify(profile, null, 2)`.
+- Services and Types
+  - `lib/users.ts` reads from Supabase with `.maybeSingle()` and returns `ProfileRow | null`.
+  - `lib/database.ts` mirrors DB rows and JSON shapes 1:1 to keep raw output predictable.
+
+## Adding Columns To profiles
+1) Write SQL to alter the table (via Supabase SQL editor or migrations).
+2) Ensure RLS policies support your read/write needs.
+3) Update `lib/database.ts` to include the new columns with correct types (including JSON shapes).
+4) If you filter columns in services, include the new fields; otherwise `select('*')` will return them automatically.
+5) Update stores/UI if you need to render or transform the new fields.
+6) Add/adjust tests for services/stores as needed.
+
 
 ## Troubleshooting
 - Xcode Simulator issues: open Xcode once, accept licenses, ensure a Simulator is installed.
