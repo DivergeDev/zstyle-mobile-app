@@ -17,7 +17,7 @@ export default function Welcome() {
 
   const handleContinue = () => {
     setOnboardingDone(true)
-    router.replace('/(tabs)')
+    router.replace('/(tabs)/(zstyle)')
   }
 
   return (
