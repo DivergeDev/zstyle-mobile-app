@@ -90,10 +90,10 @@ export const useConnectionStore = create<ConnectionStore>((set, get) => ({
     socket.send(payload);
   },
 
+  // 
   setAudio: (enabled: boolean) => {
     const { status, sessionId } = get();
     set({ isAudio: enabled });
-    // Reconnect with new mode if currently connected
     if (status === 'connected') {
       get().disconnect();
       get().connect({ sessionId: sessionId ?? createSessionId(), isAudio: enabled });
