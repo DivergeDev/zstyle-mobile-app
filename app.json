@@ -32,11 +32,7 @@
       "expo-router",
       "expo-web-browser",
       "expo-font",
-      "expo-secure-store",
-      "expo-audio",
-      {
-        "microphonePermission": "Allow $(starter-kit-expo) to access your microphone."
-      }
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
